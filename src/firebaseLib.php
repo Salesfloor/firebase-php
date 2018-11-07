@@ -225,7 +225,7 @@ class FirebaseLib implements FirebaseInterface
         if(!empty($contentHeader)) {
             $header = []; 
             foreach($contentHeader as $key => $item) {
-                $header[] = "$key: $value";
+                $header[] = "$key: $item";
             }
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         }
@@ -258,7 +258,7 @@ class FirebaseLib implements FirebaseInterface
 
         // Insert additional settings into the request header 
         foreach($contentHeader as $key => $item) {
-            $header[] = "$key: $value";
+            $header[] = "$key: $item";
         }
 
         try {
