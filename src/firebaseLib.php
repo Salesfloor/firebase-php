@@ -177,10 +177,10 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return array Response
      */
-    public function get($path, $options = array())
+    public function get($path, $options = array(), $contentHeader = array())
     {
         try {
-            $ch = $this->_getCurlHandler($path, 'GET', $options);
+            $ch = $this->_getCurlHandler($path, 'GET', $options, $contentHeader);
             $return = curl_exec($ch);
         } catch (Exception $e) {
             $return = null;
@@ -197,10 +197,10 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return array Response
      */
-    public function delete($path, $options = array())
+    public function delete($path, $options = array(), $contentHeader = array())
     {
         try {
-            $ch = $this->_getCurlHandler($path, 'DELETE', $options);
+            $ch = $this->_getCurlHandler($path, 'DELETE', $options, $contentHeader);
             $return = curl_exec($ch);
         } catch (Exception $e) {
             $return = null;
@@ -217,10 +217,19 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return resource Curl Handler
      */
-    private function _getCurlHandler($path, $mode, $options = array())
+    private function _getCurlHandler($path, $mode, $options = array(), $contentHeader = array())
     {
         $url = $this->_getJsonPath($path, $options);
         $ch = $this->_curlHandler;
+
+        if(!empty($contentHeader)) {
+            $header = []; 
+            foreach($contentHeader as $key => $item) {
+                $header[] = "$key: $value";
+            }
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        }
+
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->_timeout);
