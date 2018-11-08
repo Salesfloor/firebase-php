@@ -26,6 +26,7 @@ class FirebaseLib implements FirebaseInterface
     private $_timeout;
     private $_token;
     private $_curlHandler;
+    private  $header;
 
     /**
      * Constructor
@@ -182,6 +183,7 @@ class FirebaseLib implements FirebaseInterface
         try {
             $ch = $this->_getCurlHandler($path, 'GET', $options, $contentHeader);
             $return = curl_exec($ch);
+            $return = $this->splitHeaderBody($ch, $return);
         } catch (Exception $e) {
             $return = null;
         }
@@ -202,10 +204,15 @@ class FirebaseLib implements FirebaseInterface
         try {
             $ch = $this->_getCurlHandler($path, 'DELETE', $options, $contentHeader);
             $return = curl_exec($ch);
+            $return = $this->splitHeaderBody($ch, $return);
         } catch (Exception $e) {
             $return = null;
         }
         return $return;
+    }
+
+    public function getHeader() {
+        return $this->$header;
     }
 
     /**
@@ -241,6 +248,14 @@ class FirebaseLib implements FirebaseInterface
         return $ch;
     }
 
+    private function splitHeaderBody($ch, $return) {
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($return, 0, $header_size);
+        $body = substr($return, $header_size);
+        $this->$header = $header;
+        return $body;
+    }
+
     private function _writeData($path, $data, $method = 'PUT', $options = array(), $contentHeader = array())
     {   
         $jsonData = json_encode($data);
@@ -266,6 +281,7 @@ class FirebaseLib implements FirebaseInterface
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
             $return = curl_exec($ch);
+            $return = $this->splitHeaderBody($ch, $return);
         } catch (Exception $e) {
             $return = null;
         }
