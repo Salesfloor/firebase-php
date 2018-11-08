@@ -212,7 +212,7 @@ class FirebaseLib implements FirebaseInterface
     }
 
     public function getHeader() {
-        return $this->$header;
+        return $this->header;
     }
 
     /**
@@ -252,7 +252,7 @@ class FirebaseLib implements FirebaseInterface
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $header = substr($return, 0, $header_size);
         $body = substr($return, $header_size);
-        $this->$header = $header;
+        $this->header = $header;
         return $body;
     }
 
