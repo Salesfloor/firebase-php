@@ -26,7 +26,7 @@ class FirebaseLib implements FirebaseInterface
     private $_timeout;
     private $_token;
     private $_curlHandler;
-    public  $header;
+    private  $header;
 
     /**
      * Constructor
@@ -183,7 +183,7 @@ class FirebaseLib implements FirebaseInterface
         try {
             $ch = $this->_getCurlHandler($path, 'GET', $options, $contentHeader);
             $return = curl_exec($ch);
-            $return = splitHeaderBody($ch, $return);
+            $return = $this->splitHeaderBody($ch, $return);
         } catch (Exception $e) {
             $return = null;
         }
@@ -204,11 +204,15 @@ class FirebaseLib implements FirebaseInterface
         try {
             $ch = $this->_getCurlHandler($path, 'DELETE', $options, $contentHeader);
             $return = curl_exec($ch);
-            $return = splitHeaderBody($ch, $return);
+            $return = $this->splitHeaderBody($ch, $return);
         } catch (Exception $e) {
             $return = null;
         }
         return $return;
+    }
+
+    public function getHeader() {
+        return $this->$header;
     }
 
     /**
@@ -246,8 +250,8 @@ class FirebaseLib implements FirebaseInterface
 
     private function splitHeaderBody($ch, $return) {
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($response, 0, $header_size);
-        $body = substr($response, $header_size);
+        $header = substr($return, 0, $header_size);
+        $body = substr($return, $header_size);
         $this->$header = $header;
         return $body;
     }
@@ -277,7 +281,7 @@ class FirebaseLib implements FirebaseInterface
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
             $return = curl_exec($ch);
-            $return = splitHeaderBody($ch, $return);
+            $return = $this->splitHeaderBody($ch, $return);
         } catch (Exception $e) {
             $return = null;
         }
