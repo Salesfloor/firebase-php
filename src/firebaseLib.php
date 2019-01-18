@@ -229,13 +229,15 @@ class FirebaseLib implements FirebaseInterface
         $url = $this->_getJsonPath($path, $options);
         $ch = $this->_curlHandler;
 
-        if(!empty($contentHeader)) {
-            $header = []; 
-            foreach($contentHeader as $key => $item) {
-                $header[] = "$key: $item";
-            }
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        // SF-23323 Added Firebase Decoding to parse url query correctly
+        $contentHeader[`X-Firebase-Decoding`] = 1;
+   
+        $header = []; 
+        foreach($contentHeader as $key => $item) {
+            $header[] = "$key: $item";
         }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);
